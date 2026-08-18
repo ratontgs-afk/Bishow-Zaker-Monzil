@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>কোরবানি ম্যানেজমেন্ট সিস্টেম</title>
-    <link rel="manifest" href='data:application/manifest+json,{"name":"কোরবানি ম্যানেজমেন্ট","short_name":"কোরবানি অ্যাপ","start_url":"./","display":"standalone","background_color":"#f4f7f6","theme_color":"#0ea5e9","icons":[{"src":"https://icons.iconarchive.com/icons/custom-icon-design/flatastic-1/512/Cow-icon.png","sizes":"512x512","type":"image/png"}]}'>
+    <title>বিশ্ব জাকের মঞ্জীল - কোরবানি ম্যানেজমেন্ট</title>
+    <link rel="manifest" href='data:application/manifest+json,{"name":"বিশ্ব জাকের মঞ্জীল","short_name":"বিশ্ব জাকের মঞ্জীল","start_url":"./","display":"standalone","background_color":"#f4f7f6","theme_color":"#0ea5e9","icons":[{"src":"https://z-cdn-media.chatglm.cn/files/788c2ce9-a3ce-4694-97ed-f2ced8af631b.jpeg?auth_key=1887065562-4535915262cf4399a743231c77dde5f9-0-3c6cbd568f2ec285453c923cf0c183b1","sizes":"512x512","type":"image/png"}]}'>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0ea5e9">
     
@@ -16,7 +16,7 @@
 
         #loginPage { display: flex; justify-content: center; align-items: center; height: 100vh; width: 100%; background: linear-gradient(135deg, #1e293b, #0ea5e9); }
         .login-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 90%; max-width: 400px; text-align: center; }
-        .login-box img { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 15px; border: 3px solid #0ea5e9; }
+        .login-box img { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 15px; border: 3px solid #0ea5e9; object-fit: cover; }
         .login-box h2 { margin: 0 0 10px; color: #1e293b; }
         .login-box p { margin: 0 0 20px; color: #64748b; font-size: 14px; }
         .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-family: 'Hind Siliguri', sans-serif; font-size: 16px; box-sizing: border-box; outline: none; }
@@ -164,8 +164,8 @@
 
     <div id="loginPage">
         <div class="login-box">
-            <img id="loginCompanyLogo" src="https://icons.iconarchive.com/icons/custom-icon-design/flatastic-1/512/Cow-icon.png" alt="Logo">
-            <h2 id="loginCompanyName">আল-আমিন এগ্রো</h2>
+            <img id="loginCompanyLogo" src="https://z-cdn-media.chatglm.cn/files/788c2ce9-a3ce-4694-97ed-f2ced8af631b.jpeg?auth_key=1887065562-4535915262cf4399a743231c77dde5f9-0-3c6cbd568f2ec285453c923cf0c183b1" alt="Logo">
+            <h2 id="loginCompanyName">বিশ্ব জাকের মঞ্জীল</h2>
             <p>একাউন্টে লগইন করুন</p>
             <input type="text" id="login_username" placeholder="ইউজারনেম" onkeypress="handleLoginKeyPress(event)">
             <input type="password" id="login_password" placeholder="পাসওয়ার্ড" onkeypress="handleLoginKeyPress(event)">
@@ -176,8 +176,8 @@
     <div id="mainApp" style="display: none; width: 100%; height: 100vh;">
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <img id="companyLogo" src="https://icons.iconarchive.com/icons/custom-icon-design/flatastic-1/512/Cow-icon.png" alt="Logo">
-                <h2 id="companyName">আল-আমিন এগ্রো</h2>
+                <img id="companyLogo" src="https://z-cdn-media.chatglm.cn/files/788c2ce9-a3ce-4694-97ed-f2ced8af631b.jpeg?auth_key=1887065562-4535915262cf4399a743231c77dde5f9-0-3c6cbd568f2ec285453c923cf0c183b1" alt="Logo">
+                <h2 id="companyName">বিশ্ব জাকের মঞ্জীল</h2>
                 <p>কোরবানি ম্যানেজমেন্ট</p>
             </div>
             <div class="sidebar-menu">
@@ -387,18 +387,7 @@
                             <h3 style="border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">কোম্পানির সেটিংস</h3>
                             <form id="settingsForm" onsubmit="saveSettings(event)">
                                 <div class="form-grid">
-                                    <div class="form-group full-width"><label>কোম্পানির নাম</label><input type="text" id="newCompanyName" placeholder="নতুন কোম্পানির নাম" disabled></div>
-                                    <div class="form-group full-width"><label>নতুন লোগো আপলোড করুন</label><input type="file" id="newLogoInput" accept="image/*" disabled></div>
-                                    <div class="form-group full-width" style="flex-direction: row; align-items: center; gap: 10px; margin-bottom: 15px;">
-                                        <input type="checkbox" id="lockProfile" style="width: 20px; height: 20px;" disabled>
-                                        <label for="lockProfile" style="margin-bottom: 0; color: #ef4444; font-weight: 600;">একবার সেভ করলে আর পরিবর্তন করা যাবে না (স্থায়ীভাবে লক করুন)</label>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-group full-width" style="margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
-                                    <label>Google Sheets Web App URL</label>
-                                    <input type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/..." disabled>
-                                    <button type="button" class="btn btn-add" id="connectSheetBtn" style="margin-top: 10px; display:none;" onclick="connectSheet()">🔗 সংযুক্ত করুন</button>
+                                    <div class="form-group full-width"><label>Google Sheets Web App URL</label><input type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/..." disabled></div>
                                 </div>
 
                                 <div class="form-actions" style="margin-top:20px;">
@@ -524,23 +513,6 @@
                         users.unshift({ username: 'admin', password: '1234', role: 'admin' });
                     }
                 }
-
-                // গুগল সিট থেকে কোম্পানির নাম, লোগো এবং লক স্ট্যাটাস লোড
-                if (data.companyName) {
-                    localStorage.setItem('companyName', data.companyName);
-                    document.getElementById('companyName').innerText = data.companyName;
-                    document.getElementById('loginCompanyName').innerText = data.companyName;
-                }
-                if (data.companyLogo) {
-                    localStorage.setItem('companyLogo', data.companyLogo);
-                    document.getElementById('companyLogo').src = data.companyLogo;
-                    document.getElementById('loginCompanyLogo').src = data.companyLogo;
-                }
-                if (data.companyProfileLocked !== undefined) {
-                    localStorage.setItem('companyProfileLocked', data.companyProfileLocked ? 'true' : 'false');
-                    applyProfileLockState(data.companyProfileLocked);
-                }
-
                 saveLocal();
             }
             updateSyncStatus('synced');
@@ -555,34 +527,13 @@
         
         isSyncing = true;
         updateSyncStatus('syncing');
-        
-        // কোম্পানির নাম, লোগো এবং লক স্ট্যাটাস গুগল সিটে পাঠানো হচ্ছে
-        let appData = {
-            cows, sacrificedCows, sales, users,
-            companyName: localStorage.getItem('companyName') || 'আল-আমিন এগ্রো',
-            companyLogo: localStorage.getItem('companyLogo') || 'https://icons.iconarchive.com/icons/custom-icon-design/flatastic-1/512/Cow-icon.png',
-            companyProfileLocked: localStorage.getItem('companyProfileLocked') === 'true'
-        };
-        
+        let appData = { cows, sacrificedCows, sales, users }; 
         try {
             await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(appData) });
             updateSyncStatus('synced');
         } catch (error) { updateSyncStatus('error'); }
         isSyncing = false;
         if (pendingSync) { pendingSync = false; saveData(); }
-    }
-
-    // প্রোফাইল লক স্টেট অ্যাপ্লাই করার ফাংশন
-    function applyProfileLockState(isLocked) {
-        let profileSettings = document.getElementById('companyProfileSettings');
-        let lockedMsg = document.getElementById('profileLockedMessage');
-        if (isLocked) {
-            profileSettings.style.display = 'none';
-            lockedMsg.style.display = 'block';
-        } else {
-            profileSettings.style.display = 'block';
-            lockedMsg.style.display = 'none';
-        }
     }
 
     window.addEventListener('online', () => { if(SCRIPT_URL){ updateSyncStatus('synced'); saveData(); loadData(); } });
@@ -626,68 +577,28 @@
         let pass = document.getElementById('verify_password').value;
         let adminUser = users.find(u => u.role === 'admin');
         if(pass === adminUser.password) {
-            // এডমিন লক থাকলেও আনলক করে পরিবর্তন করতে পারবে
             document.getElementById('companyProfileSettings').style.display = 'block';
             document.getElementById('profileLockedMessage').style.display = 'none';
             
-            document.getElementById('newCompanyName').disabled = false;
-            document.getElementById('newLogoInput').disabled = false;
-            document.getElementById('lockProfile').disabled = false;
             document.getElementById('scriptUrlInput').disabled = false;
             document.getElementById('saveSettingsBtn').style.display = 'inline-block';
-            document.getElementById('connectSheetBtn').style.display = 'inline-block';
             document.getElementById('unlockBtn').style.display = 'none';
             closePasswordModal();
         } else { alert("ভুল পাসওয়ার্ড!"); }
     }
     
-    function connectSheet() {
+    function saveSettings(event) {
+        event.preventDefault();
         let url = document.getElementById('scriptUrlInput').value;
         if(url.trim() !== '') {
             localStorage.setItem('googleScriptUrl', url.trim());
             SCRIPT_URL = url.trim();
-            alert('গুগল সিট সফলভাবে সংযুক্ত হয়েছে! ডেটা লোড হচ্ছে...');
+            alert('সেটিংস সফলভাবে আপডেট হয়েছে! ডেটা লোড হচ্ছে...');
             loadData();
         } else { alert('অনুগ্রহ করে একটি বৈধ URL দিন।'); }
-    }
-    
-    function saveSettings(event) {
-        event.preventDefault();
-        let newName = document.getElementById('newCompanyName').value, logoInput = document.getElementById('newLogoInput');
-        if (newName.trim() !== '') { 
-            localStorage.setItem('companyName', newName); 
-            document.getElementById('companyName').innerText = newName; 
-            document.getElementById('loginCompanyName').innerText = newName; 
-        }
-        if (logoInput.files && logoInput.files[0]) {
-            let reader = new FileReader();
-            reader.onload = function(e) { 
-                localStorage.setItem('companyLogo', e.target.result); 
-                document.getElementById('companyLogo').src = e.target.result; 
-                document.getElementById('loginCompanyLogo').src = e.target.result; 
-            };
-            reader.readAsDataURL(logoInput.files[0]);
-        }
-        
-        let isLocked = document.getElementById('lockProfile').checked;
-        localStorage.setItem('companyProfileLocked', isLocked ? 'true' : 'false');
-        applyProfileLockState(isLocked);
-        
-        if (isLocked) {
-            alert('কোম্পানির প্রোফাইল স্থায়ীভাবে লক করা হয়েছে! শুধুমাত্র এডমিন পাসওয়ার্ড দিয়ে আনলক করতে পারবেন।');
-        } else {
-            alert('সেটিংস সফলভাবে আপডেট হয়েছে!');
-        }
-        
-        saveData(); // গুগল সিটে সেভ হবে
 
-        document.getElementById('settingsForm').reset();
-        document.getElementById('newCompanyName').disabled = true;
-        document.getElementById('newLogoInput').disabled = true;
-        document.getElementById('lockProfile').disabled = true;
         document.getElementById('scriptUrlInput').disabled = true;
         document.getElementById('saveSettingsBtn').style.display = 'none';
-        document.getElementById('connectSheetBtn').style.display = 'none';
         document.getElementById('unlockBtn').style.display = 'inline-block';
     }
 
@@ -858,21 +769,6 @@
     function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
 
     window.onload = async function() {
-        let savedName = localStorage.getItem('companyName');
-        let savedLogo = localStorage.getItem('companyLogo');
-        if(savedName) {
-            document.getElementById('companyName').innerText = savedName;
-            document.getElementById('loginCompanyName').innerText = savedName;
-        }
-        if(savedLogo) {
-            document.getElementById('companyLogo').src = savedLogo;
-            document.getElementById('loginCompanyLogo').src = savedLogo;
-        }
-
-        if (localStorage.getItem('companyProfileLocked') === 'true') {
-            applyProfileLockState(true);
-        }
-
         await loadData(); 
         let savedUser = localStorage.getItem('qurbaniCurrentUser');
         if(savedUser) {
