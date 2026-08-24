@@ -29,7 +29,6 @@
         .sidebar { width: 280px; background-color: #1e293b; color: #fff; display: flex; flex-direction: column; flex-shrink: 0; position: relative; z-index: 1001; }
         .sidebar-header { padding: 25px 20px; text-align: center; border-bottom: 1px solid #334155; }
         
-        /* লোগোর আলোর ঝলকানি (Shine Effect) স্টাইল */
         .logo-wrapper { position: relative; width: 90px; height: 90px; margin: 0 auto 15px; border-radius: 50%; overflow: hidden; border: 3px solid #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
         .logo-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
         .logo-wrapper::after { content: ''; position: absolute; top: 0; left: -75%; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 100%); transform: skewX(-25deg); z-index: 2; animation: shine-effect 4s infinite; }
@@ -140,15 +139,22 @@
 
         .user-list-item { display: flex; justify-content: space-between; align-items: center; background: #f1f5f9; padding: 10px 15px; border-radius: 8px; margin-bottom: 10px; }
         .role-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-        .role-admin { background: #fee2e2; color: #991b1b; }
-        .role-user { background: #e0f2fe; color: #0369a1; }
-        .role-viewer { background: #f1f5f9; color: #475569; }
+        .role-full { background: #fee2e2; color: #991b1b; }
+        .role-write { background: #e0f2fe; color: #0369a1; }
+        .role-read { background: #f1f5f9; color: #475569; }
 
-        body.role-viewer .admin-only { display: none !important; }
+        body.role-read .admin-only, body.role-read .write-only { display: none !important; }
+        body.role-write .admin-only { display: none !important; }
 
-        /* মোবাইল ডিভাইসের জন্য সাইডবার হাইড/শো স্টাইল */
         .sidebar-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
         .sidebar-backdrop.active { display: block; }
+
+        .switch { position: relative; display: inline-block; width: 60px; height: 34px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #10b981; }
+        input:checked + .slider:before { transform: translateX(26px); }
 
         @media (max-width: 768px) {
             .sidebar { position: fixed; left: -280px; height: 100%; transition: left 0.3s ease; }
@@ -205,11 +211,12 @@
             </div>
             <div class="sidebar-menu">
                 <a href="#" class="menu-item active" onclick="showPage('dashboard', this)"><span class="menu-icon">📊</span> ড্যাশবোর্ড</a>
-                <a href="#" class="menu-item admin-only" onclick="showPage('add-animal', this)"><span class="menu-icon">➕</span> নতুন যোগ করুন</a>
+                <a href="#" class="menu-item write-only" onclick="showPage('add-animal', this)"><span class="menu-icon">➕</span> নতুন যোগ করুন</a>
                 <a href="#" class="menu-item" onclick="showPage('animals', this)"><span class="menu-icon">🐄</span> পশুর তালিকা</a>
                 <a href="#" class="menu-item" onclick="showPage('sacrificed', this)"><span class="menu-icon">🩸</span> কোরবানি কৃত পশু</a>
                 <a href="#" class="menu-item" onclick="showPage('sales', this)"><span class="menu-icon">🛒</span> বিক্রয়</a>
                 <a href="#" class="menu-item" onclick="showPage('accounts', this)"><span class="menu-icon">💰</span> হিসাব-নিকাশ</a>
+                <a href="#" class="menu-item admin-only" id="menu-expenses" onclick="showPage('expenses', this)" style="display:none;"><span class="menu-icon">🧾</span> খরচের হিসাব</a>
                 <a href="#" class="menu-item admin-only" onclick="showPage('settings', this)"><span class="menu-icon">⚙️</span> সেটিংস</a>
             </div>
         </div>
@@ -238,7 +245,7 @@
                 </div>
 
                 <div id="add-animal-page" class="page-section">
-                    <div class="form-container admin-only">
+                    <div class="form-container write-only">
                         <h3 style="border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">নতুন পশুর তথ্য দিন</h3>
                         <form id="addCowForm" onsubmit="handleAddCow(event)">
                             <div class="form-grid">
@@ -313,7 +320,7 @@
                     <div class="table-container">
                         <div class="header-section">
                             <div class="input-group" style="max-width: 500px; flex: 1;">
-                                <input type="text" id="searchInput" class="search-input" placeholder="বারকোড স্ক্যান বা লিখে খুঁজুন..." onkeyup="searchCows()" style="border-radius: 8px 0 0 8px;">
+                                <input type="text" id="searchInput" class="search-input" placeholder="বারকোড বা ইউজার নাম লিখে খুঁজুন..." onkeyup="searchCows()" style="border-radius: 8px 0 0 8px;">
                                 <button type="button" class="btn btn-scan" onclick="startScanner('searchInput')" style="border-radius: 0 8px 8px 0;">📷</button>
                             </div>
                             <button class="btn btn-print" onclick="printTable()">🖨️ প্রিন্ট</button>
@@ -329,7 +336,7 @@
                         </div>
                         <div class="table-responsive">
                             <table id="cowTable">
-                                <thead><tr><th>ক্রমিক</th><th>ইউনিক নাম্বার</th><th>ধরন</th><th>রঙ</th><th>ক্যাটাগরি</th><th>ওজন</th><th>মূল্য</th><th>তথ্য</th><th class="admin-only">অ্যাকশন</th></tr></thead>
+                                <thead><tr><th>ক্রমিক</th><th>ইউনিক নাম্বার</th><th>ধরন</th><th>রঙ</th><th>ক্যাটাগরি</th><th>ওজন</th><th>মূল্য</th><th>তথ্য</th><th>যুক্ত করেছেন</th><th class="write-only">অ্যাকশন</th></tr></thead>
                                 <tbody id="cowData"></tbody>
                             </table>
                         </div>
@@ -349,7 +356,7 @@
                         <h3 style="margin-top:0; margin-bottom:20px; text-align:center;">কোরবানি সম্পন্ন হওয়া পশুর তালিকা</h3>
                         <div class="table-responsive">
                             <table id="sacrificedTable">
-                                <thead><tr><th>ক্রমিক</th><th>ইউনিক নাম্বার</th><th>ধরন</th><th>রঙ</th><th>ক্যাটাগরি</th><th>ওজন</th><th>মূল্য</th><th>তথ্য</th></tr></thead>
+                                <thead><tr><th>ক্রমিক</th><th>ইউনিক নাম্বার</th><th>ধরন</th><th>রঙ</th><th>ক্যাটাগরি</th><th>ওজন</th><th>মূল্য</th><th>তথ্য</th><th>যুক্ত করেছেন</th></tr></thead>
                                 <tbody id="sacrificedData"></tbody>
                             </table>
                         </div>
@@ -359,7 +366,7 @@
 
                 <div id="sales-page" class="page-section">
                     <div class="main-stats-grid" id="salesCardsGrid"></div>
-                    <div class="table-container admin-only">
+                    <div class="table-container write-only">
                         <h3 style="margin-top:0; margin-bottom:20px;">নতুন বিক্রয় যোগ করুন</h3>
                         <form id="addSaleForm" onsubmit="handleAddSale(event)">
                             <div class="expense-form-row">
@@ -385,7 +392,7 @@
                         </div>
                         <div class="table-responsive">
                             <table id="saleTable">
-                                <thead><tr><th>ক্রমিক</th><th>তারিখ</th><th>পশু</th><th>ক্রেতার নাম</th><th>মোবাইল</th><th>সম্ভাব্য মূল্য</th><th>বিক্রয় মূল্য</th><th>জমা</th><th>বাকি</th><th class="admin-only">অ্যাকশন</th></tr></thead>
+                                <thead><tr><th>ক্রমিক</th><th>তারিখ</th><th>পশু</th><th>ক্রেতার নাম</th><th>মোবাইল</th><th>সম্ভাব্য মূল্য</th><th>বিক্রয় মূল্য</th><th>জমা</th><th>বাকি</th><th class="write-only">অ্যাকশন</th></tr></thead>
                                 <tbody id="saleData"></tbody>
                                 <tfoot id="saleFooter" style="background-color: #f1f5f9; font-weight: bold; color: #0c4a6e;"></tfoot>
                             </table>
@@ -397,6 +404,49 @@
                 <div id="accounts-page" class="page-section">
                     <h3 style="margin-top:0; margin-bottom:20px;">হিসাব-নিকাশ সারাংশ</h3>
                     <div class="main-stats-grid" id="accountsCardsGrid"></div>
+                </div>
+
+                <div id="expenses-page" class="page-section">
+                    <div class="table-container admin-only">
+                        <h3 style="margin-top:0; margin-bottom:20px;">নতুন খরচ যোগ করুন</h3>
+                        <form id="addExpenseForm" onsubmit="handleAddExpense(event)">
+                            <div class="expense-form-row">
+                                <div class="form-group" style="flex:1; min-width:150px;">
+                                    <label>খরচের ধরন</label>
+                                    <select id="exp_type" required>
+                                        <option value="পশু ক্রয়">পশু ক্রয়</option>
+                                        <option value="খাদ্য/তৃণ">খাদ্য/তৃণ</option>
+                                        <option value="চিকিৎসা">চিকিৎসা</option>
+                                        <option value="শ্রমিক/মজুরি">শ্রমিক/মজুরি</option>
+                                        <option value="অন্যান্য">অন্যান্য</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="flex:1; min-width:150px;">
+                                    <label>পরিমাণ (টাকা)</label>
+                                    <input type="number" id="exp_amount" placeholder="যেমন: 5000" required>
+                                </div>
+                                <div class="form-group" style="flex:2; min-width:200px;">
+                                    <label>বিবরণ</label>
+                                    <input type="text" id="exp_desc" placeholder="খরচের বিস্তারিত">
+                                </div>
+                                <button type="submit" class="btn btn-add">+ যোগ করুন</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="table-container">
+                        <div class="header-section">
+                            <h3 style="margin:0;">খরচের তালিকা</h3>
+                            <button class="btn btn-print" onclick="printTable()">🖨️ প্রিন্ট</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="expenseTable" class="expense-table">
+                                <thead><tr><th>ক্রমিক</th><th>তারিখ</th><th>ধরন</th><th>বিবরণ</th><th>পরিমাণ</th><th class="admin-only">অ্যাকশন</th></tr></thead>
+                                <tbody id="expenseData"></tbody>
+                                <tfoot id="expenseFooter" style="background-color: #f1f5f9; font-weight: bold; color: #0c4a6e;"></tfoot>
+                            </table>
+                        </div>
+                        <div id="noExpenseData" class="no-data">কোনো খরচের তথ্য যোগ করা হয়নি!</div>
+                    </div>
                 </div>
 
                 <div id="settings-page" class="page-section admin-only">
@@ -420,32 +470,64 @@
                             </form>
                         </div>
 
-                        <div id="profileLockedMessage" style="display:none; text-align:center; padding: 30px 20px; background: #f1f5f9; border-radius: 8px; color: #64748b;">
-                            <p style="font-size: 16px; margin-bottom: 15px;">🔒 কোম্পানির প্রোফাইল স্থায়ীভাবে লক করা আছে।</p>
-                            <button type="button" class="btn btn-lock" onclick="unlockSettings()">🔒 এডমিন পাসওয়ার্ড দিন (আনলক করতে)</button>
-                        </div>
-
                         <div style="margin-top:30px; border-top: 2px solid #e2e8f0; padding-top:20px;">
-                            <h3>🔑 এডমিন পাসওয়ার্ড পরিবর্তন</h3>
-                            <form onsubmit="changeAdminPassword(event)" style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
-                                <input type="password" id="cur_pass" placeholder="বর্তমান পাসওয়ার্ড" style="flex:1; min-width: 150px; padding:10px; border:2px solid #e2e8f0; border-radius:8px;" required>
-                                <input type="password" id="new_pass" placeholder="নতুন পাসওয়ার্ড" style="flex:1; min-width: 150px; padding:10px; border:2px solid #e2e8f0; border-radius:8px;" required>
-                                <button type="submit" class="btn btn-save">আপডেট করুন</button>
-                            </form>
+                            <h3>🧰 অ্যাডভান্সড সেটিংস</h3>
+                            <div style="display:flex; justify-content:space-between; align-items:center; background:#f1f5f9; padding:15px; border-radius:8px; margin-top:10px;">
+                                <div><strong>খরচের হিসাব মডিউল</strong><br><small style="color:#64748b;">এই ফিচারটি চালু বা বন্ধ করতে টগল করুন</small></div>
+                                <label class="switch">
+                                    <input type="checkbox" id="expenseToggle" onchange="toggleExpenseModule()">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
                         </div>
 
-                        <div id="userManagementSection" style="display:none; margin-top:30px; border-top: 2px solid #e2e8f0; padding-top:20px;">
-                            <h3>👤 ইউজার ম্যানেজমেন্ট</h3>
-                            <form onsubmit="addNewUser(event)" style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
-                                <input type="text" id="new_username" placeholder="নতুন ইউজারনেম" style="flex:1; min-width: 150px; padding:10px; border:2px solid #e2e8f0; border-radius:8px;" required>
-                                <input type="password" id="new_password" placeholder="পাসওয়ার্ড" style="flex:1; min-width: 150px; padding:10px; border:2px solid #e2e8f0; border-radius:8px;" required>
-                                <select id="new_role" style="flex:1; min-width: 120px; padding:10px; border:2px solid #e2e8f0; border-radius:8px;">
-                                    <option value="user">ইউজার (এডিট করতে পারবে)</option>
-                                    <option value="viewer">ভিউয়ার (শুধু দেখতে পারবে)</option>
-                                </select>
-                                <button type="submit" class="btn btn-add">+ ইউজার যোগ</button>
-                            </form>
-                            <div id="userListContainer"></div>
+                        <!-- পাসওয়ার্ড প্রটেক্টেড এডমিন টুলস সেকশন -->
+                        <div style="margin-top:30px; border-top: 2px solid #e2e8f0; padding-top:20px;">
+                            <h3>🛡️ এডমিন টুলস (পাসওয়ার্ড প্রটেক্টেড)</h3>
+                            
+                            <div id="adminToolsLocked" style="text-align:center; padding: 20px; background: #f1f5f9; border-radius: 8px; margin-top: 10px;">
+                                <p style="margin-bottom: 15px;">🔒 পাসওয়ার্ড, ইউজার ও ডাটা ম্যানেজমেন্ট লক করা আছে।</p>
+                                <button type="button" class="btn btn-lock" onclick="unlockAdminTools()">🔒 আনলক করুন</button>
+                            </div>
+
+                            <div id="adminToolsSection" style="display:none;">
+                                <div style="margin-top:20px; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px;">
+                                    <h4>🔑 এডমিন পাসওয়ার্ড পরিবর্তন</h4>
+                                    <form onsubmit="changeAdminPassword(event)" style="display:flex; gap:10px; margin-top:15px; margin-bottom:20px; flex-wrap:wrap;">
+                                        <input type="password" id="cur_pass" placeholder="বর্তমান পাসওয়ার্ড" style="flex:1; min-width: 150px; padding:10px; border:2px solid #e2e8f0; border-radius:8px;" required>
+                                        <input type="password" id="new_pass" placeholder="নতুন পাসওয়ার্ড" style="flex:1; min-width: 150px; padding:10px; border:2px solid #e2e8f0; border-radius:8px;" required>
+                                        <button type="submit" class="btn btn-save">আপডেট করুন</button>
+                                    </form>
+                                </div>
+
+                                <div style="margin-top:20px; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px;">
+                                    <h4>👤 ইউজার ম্যানেজমেন্ট</h4>
+                                    <form onsubmit="addNewUser(event)" style="display:flex; gap:10px; margin-top:15px; margin-bottom:20px; flex-wrap:wrap;">
+                                        <input type="text" id="new_username" placeholder="নতুন ইউজারনেম" style="flex:1; min-width: 150px; padding:10px; border:2px solid #e2e8f0; border-radius:8px;" required>
+                                        <input type="password" id="new_password" placeholder="পাসওয়ার্ড" style="flex:1; min-width: 150px; padding:10px; border:2px solid #e2e8f0; border-radius:8px;" required>
+                                        <select id="new_role" style="flex:1; min-width: 120px; padding:10px; border:2px solid #e2e8f0; border-radius:8px;">
+                                            <option value="full">Full (সম্পূর্ণ অ্যাক্সেস)</option>
+                                            <option value="write">Write (এডিট করতে পারবে)</option>
+                                            <option value="read">Read (শুধু দেখতে পারবে)</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-add">+ ইউজার যোগ</button>
+                                    </form>
+                                    <div id="userListContainer"></div>
+                                </div>
+
+                                <!-- ডাটা ম্যানেজমেন্ট (ব্যাকআপ ও রিসেট) সেকশন -->
+                                <div style="margin-top:20px; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; background: #fff1f2;">
+                                    <h4>💾 ডাটা ম্যানেজমেন্ট (ব্যাকআপ ও রিসেট)</h4>
+                                    <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">সতর্কতার জন্য নিয়মিত ব্যাকআপ নিন। রিসেট করলে সকল ডাটা মুছে যাবে।</p>
+                                    <div style="display:flex; gap: 10px; flex-wrap:wrap;">
+                                        <button type="button" class="btn btn-print" onclick="backupData()">📥 ব্যাকআপ ডাউনলোড করুন</button>
+                                        <input type="file" id="restoreFileInput" accept=".json" onchange="restoreData(event)" style="display:none;">
+                                        <button type="button" class="btn btn-add" onclick="document.getElementById('restoreFileInput').click()">📁 ব্যাকআপ থেকে রিস্টোর করুন</button>
+                                        <button type="button" class="btn btn-delete" onclick="resetAppData()">🗑️ সম্পূর্ণ ডাটা রিসেট করুন</button>
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -456,7 +538,7 @@
     <div id="passwordModal" class="modal">
         <div class="modal-content" style="max-width: 400px;">
             <h3>🔒 এডমিন ভেরিফিকেশন</h3>
-            <p style="margin-bottom: 20px; font-size: 14px; color: #64748b;">সেটিংস পরিবর্তন করতে এডমিন পাসওয়ার্ড দিন।</p>
+            <p style="margin-bottom: 20px; font-size: 14px; color: #64748b;">এই অংশটি পরিবর্তন করতে এডমিন পাসওয়ার্ড দিন।</p>
             <input type="password" id="verify_password" placeholder="এডমিন পাসওয়ার্ড">
             <button class="modal-btn btn-save" onclick="verifyAdmin()">ভেরিফাই করুন</button>
             <button class="modal-btn btn-cancel" onclick="closePasswordModal()">বাতিল</button>
@@ -476,7 +558,8 @@
     let cows = [];
     let sacrificedCows = [];
     let sales = [];
-    let users = [{ username: 'admin', password: '1234', role: 'admin' }];
+    let expenses = [];
+    let users = [{ username: 'admin', password: '1234', role: 'full' }];
     let currentUser = null;
     let isSyncing = false;
     let pendingSync = false;
@@ -501,21 +584,27 @@
         indicator.innerHTML = `${icon} ${text}`;
     }
 
-    function saveLocal() { localStorage.setItem('qurbaniAppData', JSON.stringify({ cows, sacrificedCows, sales, users })); }
+    function saveLocal() { localStorage.setItem('qurbaniAppData', JSON.stringify({ cows, sacrificedCows, sales, users, expenses })); }
 
     async function loadData() {
         let localData = localStorage.getItem('qurbaniAppData');
         if(localData) {
             let data = JSON.parse(localData);
             cows = data.cows || []; sacrificedCows = data.sacrificedCows || []; sales = data.sales || [];
+            expenses = data.expenses || [];
             
             let loadedUsers = data.users || [];
             if (loadedUsers.length > 0) {
                 users = loadedUsers;
-                if (!users.find(u => u.username === 'admin' && u.role === 'admin')) {
-                    users.unshift({ username: 'admin', password: '1234', role: 'admin' });
+                users.forEach(u => {
+                    if (u.role === 'admin') u.role = 'full';
+                    if (u.role === 'user') u.role = 'write';
+                    if (u.role === 'viewer') u.role = 'read';
+                });
+                if (!users.find(u => u.username === 'admin' && u.role === 'full')) {
+                    users.unshift({ username: 'admin', password: '1234', role: 'full' });
                 }
-            } else { users = [{ username: 'admin', password: '1234', role: 'admin' }]; }
+            } else { users = [{ username: 'admin', password: '1234', role: 'full' }]; }
         }
 
         if (!SCRIPT_URL) { updateSyncStatus('not-connected'); return; }
@@ -528,12 +617,18 @@
                 let data = JSON.parse(text);
                 cows = data.cows || cows; sacrificedCows = data.sacrificedCows || sacrificedCows;
                 sales = data.sales || sales; 
+                expenses = data.expenses || expenses;
                 
                 let cloudUsers = data.users || [];
                 if (cloudUsers.length > 0) {
                     users = cloudUsers;
-                    if (!users.find(u => u.username === 'admin' && u.role === 'admin')) {
-                        users.unshift({ username: 'admin', password: '1234', role: 'admin' });
+                    users.forEach(u => {
+                        if (u.role === 'admin') u.role = 'full';
+                        if (u.role === 'user') u.role = 'write';
+                        if (u.role === 'viewer') u.role = 'read';
+                    });
+                    if (!users.find(u => u.username === 'admin' && u.role === 'full')) {
+                        users.unshift({ username: 'admin', password: '1234', role: 'full' });
                     }
                 }
                 saveLocal();
@@ -550,7 +645,7 @@
         
         isSyncing = true;
         updateSyncStatus('syncing');
-        let appData = { cows, sacrificedCows, sales, users }; 
+        let appData = { cows, sacrificedCows, sales, users, expenses };
         try {
             await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(appData) });
             updateSyncStatus('synced');
@@ -562,11 +657,32 @@
     window.addEventListener('online', () => { if(SCRIPT_URL){ updateSyncStatus('synced'); saveData(); loadData(); } });
     window.addEventListener('offline', () => { updateSyncStatus('offline'); });
 
+    function toggleExpenseModule() {
+        let isChecked = document.getElementById('expenseToggle').checked;
+        localStorage.setItem('expenseModuleEnabled', isChecked);
+        applySettingsVisibility();
+    }
+
+    function applySettingsVisibility() {
+        let isEnabled = localStorage.getItem('expenseModuleEnabled') === 'true';
+        let expenseMenu = document.getElementById('menu-expenses');
+        if(expenseMenu) {
+            expenseMenu.style.display = isEnabled ? 'flex' : 'none';
+        }
+        if (!isEnabled && document.getElementById('expenses-page').classList.contains('active')) {
+            showPage('dashboard', document.querySelector('.menu-item'));
+        }
+    }
+
     function login() {
         const u = document.getElementById('login_username').value, p = document.getElementById('login_password').value;
         let user = users.find(x => x.username === u && x.password === p);
-        if(user) { currentUser = user; localStorage.setItem('qurbaniCurrentUser', JSON.stringify(user)); showApp(); } 
-        else { alert("ভুল ইউজারনেম বা পাসওয়ার্ড!"); }
+        if(user) { 
+            if (user.role === 'admin') user.role = 'full';
+            if (user.role === 'user') user.role = 'write';
+            if (user.role === 'viewer') user.role = 'read';
+            currentUser = user; localStorage.setItem('qurbaniCurrentUser', JSON.stringify(user)); showApp(); 
+        } else { alert("ভুল ইউজারনেম বা পাসওয়ার্ড!"); }
     }
     function handleLoginKeyPress(event) { if(event.key === 'Enter') login(); }
     function logout() {
@@ -583,29 +699,41 @@
         document.getElementById('settingsUserRole').innerText = currentUser.role;
         
         document.body.className = ''; 
-        if (currentUser.role === 'viewer') {
-            document.body.classList.add('role-viewer');
-        } else if (currentUser.role === 'admin') {
-            document.getElementById('userManagementSection').style.display = 'block';
+        if (currentUser.role === 'read') {
+            document.body.classList.add('role-read');
+        } else if (currentUser.role === 'write') {
+            document.body.classList.add('role-write');
         }
 
         if(localStorage.getItem('googleScriptUrl')) document.getElementById('scriptUrlInput').value = localStorage.getItem('googleScriptUrl');
+        
+        document.getElementById('expenseToggle').checked = localStorage.getItem('expenseModuleEnabled') === 'true';
+        applySettingsVisibility();
+
+        document.getElementById('adminToolsSection').style.display = 'none';
+        document.getElementById('adminToolsLocked').style.display = 'block';
+
         renderUsers(); displayCows(cows);
     }
     
-    function unlockSettings() { document.getElementById('passwordModal').style.display = 'flex'; }
+    function unlockSettings() { window.unlockTarget = 'settings'; document.getElementById('passwordModal').style.display = 'flex'; }
+    function unlockAdminTools() { window.unlockTarget = 'adminTools'; document.getElementById('passwordModal').style.display = 'flex'; }
     function closePasswordModal() { document.getElementById('passwordModal').style.display = 'none'; document.getElementById('verify_password').value = ''; }
     
     function verifyAdmin() {
         let pass = document.getElementById('verify_password').value;
-        let adminUser = users.find(u => u.role === 'admin');
+        let adminUser = users.find(u => u.role === 'full' || u.role === 'admin');
         if(pass === adminUser.password) {
-            document.getElementById('companyProfileSettings').style.display = 'block';
-            document.getElementById('profileLockedMessage').style.display = 'none';
-            
-            document.getElementById('scriptUrlInput').disabled = false;
-            document.getElementById('saveSettingsBtn').style.display = 'inline-block';
-            document.getElementById('unlockBtn').style.display = 'none';
+            if (window.unlockTarget === 'adminTools') {
+                document.getElementById('adminToolsSection').style.display = 'block';
+                document.getElementById('adminToolsLocked').style.display = 'none';
+            } else {
+                document.getElementById('companyProfileSettings').style.display = 'block';
+                document.getElementById('profileLockedMessage').style.display = 'none';
+                document.getElementById('scriptUrlInput').disabled = false;
+                document.getElementById('saveSettingsBtn').style.display = 'inline-block';
+                document.getElementById('unlockBtn').style.display = 'none';
+            }
             closePasswordModal();
         } else { alert("ভুল পাসওয়ার্ড!"); }
     }
@@ -619,7 +747,6 @@
             alert('সেটিংস সফলভাবে আপডেট হয়েছে! ডেটা লোড হচ্ছে...');
             loadData();
         } else { alert('অনুগ্রহ করে একটি বৈধ URL দিন।'); }
-
         document.getElementById('scriptUrlInput').disabled = true;
         document.getElementById('saveSettingsBtn').style.display = 'none';
         document.getElementById('unlockBtn').style.display = 'inline-block';
@@ -629,7 +756,7 @@
         event.preventDefault();
         let curPass = document.getElementById('cur_pass').value;
         let newPass = document.getElementById('new_pass').value;
-        let adminUser = users.find(u => u.role === 'admin');
+        let adminUser = users.find(u => u.role === 'full' || u.role === 'admin');
         if (curPass === adminUser.password) {
             adminUser.password = newPass;
             saveData();
@@ -652,8 +779,8 @@
         let container = document.getElementById('userListContainer');
         if(!container) return; container.innerHTML = '';
         users.forEach(u => {
-            let roleBadge = u.role === 'admin' ? `<span class="role-badge role-admin">Admin</span>` : (u.role === 'viewer' ? `<span class="role-badge role-viewer">Viewer</span>` : `<span class="role-badge role-user">User</span>`);
-            let deleteBtn = u.role !== 'admin' ? `<button class="btn-action btn-delete" onclick="deleteUser('${u.username}')">🗑️</button>` : '';
+            let roleBadge = u.role === 'full' ? `<span class="role-badge role-full">Full</span>` : (u.role === 'read' ? `<span class="role-badge role-read">Read</span>` : `<span class="role-badge role-write">Write</span>`);
+            let deleteBtn = u.role !== 'full' ? `<button class="btn-action btn-delete" onclick="deleteUser('${u.username}')">🗑️</button>` : '';
             container.innerHTML += `<div class="user-list-item"><div><strong>${u.username}</strong></div><div style="display:flex; align-items:center; gap:10px;">${roleBadge}${deleteBtn}</div></div>`;
         });
     }
@@ -678,7 +805,6 @@
         } else { document.getElementById('scannerModal').style.display = 'none'; }
     }
 
-    // সাইডবার টগল ফাংশন (মোবাইলের জন্য আপডেট করা হলো)
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
         const backdrop = document.getElementById('sidebarBackdrop');
@@ -691,16 +817,13 @@
         document.getElementById(pageName + '-page').classList.add('active');
         document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
         if(element) element.classList.add('active');
-        const titles = { 'dashboard': 'ড্যাশবোর্ড', 'animals': 'পশুর তালিকা', 'add-animal': 'নতুন যোগ করুন', 'sacrificed': 'কোরবানি কৃত পশু', 'sales': 'বিক্রয় তালিকা', 'accounts': 'হিসাব-নিকাশ', 'settings':'সেটিংস' };
+        const titles = { 'dashboard': 'ড্যাশবোর্ড', 'animals': 'পশুর তালিকা', 'add-animal': 'নতুন যোগ করুন', 'sacrificed': 'কোরবানি কৃত পশু', 'sales': 'বিক্রয় তালিকা', 'accounts': 'হিসাব-নিকাশ', 'expenses':'খরচের হিসাব', 'settings':'সেটিংস' };
         document.getElementById('pageTitle').innerText = titles[pageName] || 'ড্যাশবোর্ড';
         if(pageName === 'sacrificed') displaySacrificedCows();
         if(pageName === 'sales') displaySales();
         if(pageName === 'accounts') displayAccounts();
-        
-        // মোবাইলে মেনু ক্লিক করলে সাইডবার বন্ধ হয়ে যাবে
-        if (window.innerWidth <= 768) {
-            toggleSidebar();
-        }
+        if(pageName === 'expenses') displayExpenses();
+        if (window.innerWidth <= 768) { toggleSidebar(); }
     }
 
     function updateDashboard(data) {
@@ -709,7 +832,6 @@
         let tWeight = data.reduce((sum, cow) => sum + cow.weight, 0);
         let tPrice = data.reduce((sum, cow) => sum + cow.price, 0);
         let avgW = data.length > 0 ? Math.round(tWeight / data.length) : 0;
-        
         let sacrificedCount = sacrificedCows.length;
         
         mainGrid.innerHTML = `
@@ -717,11 +839,7 @@
             <div class="stat-square border-green"><h3>মোট ওজন</h3><div class="big-num">${tWeight.toLocaleString('bn-BD')}</div><p class="sub-text">কেজি</p></div>
             <div class="stat-square border-purple"><h3>সম্ভাব্য মূল্য</h3><div class="big-num" style="font-size: 24px;">${tPrice.toLocaleString('bn-BD')}</div><p class="sub-text">টাকা</p></div>
             <div class="stat-square border-orange"><h3>গড় ওজন</h3><div class="big-num">${avgW.toLocaleString('bn-BD')}</div><p class="sub-text">কেজি</p></div>
-            <div class="stat-square border-red">
-                <h3>কোরবানি কৃত</h3>
-                <div class="big-num">${sacrificedCount}</div>
-                <p class="sub-text">টি পশুর কোরবানি হয়েছে</p>
-            </div>`;
+            <div class="stat-square border-red"><h3>কোরবানি কৃত</h3><div class="big-num">${sacrificedCount}</div><p class="sub-text">টি পশুর কোরবানি হয়েছে</p></div>`;
             
         const breedSummary = {};
         data.forEach(cow => { if(!breedSummary[cow.type]) breedSummary[cow.type] = 0; breedSummary[cow.type]++; });
@@ -735,17 +853,17 @@
             let notesColor = "background:#f1f5f9; color:#475569;";
             if(cow.notes === "অসুস্থ") notesColor = "background:#fee2e2; color:#991b1b;";
             if(cow.notes === "হাসপাতালে চিকিৎসাধীন") notesColor = "background:#ffedd5; color:#9a3412;";
-            tableBody.innerHTML += `<tr><td>${index + 1}</td><td><span class="unique-id">${cow.uniqueNo}</span></td><td>${cow.type}</td><td>${cow.color}</td><td><span style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:20px; font-weight:600; font-size:13px;">${cow.catName}</span></td><td>${cow.weight} কেজি</td><td>${cow.price.toLocaleString('bn-BD')} ৳</td><td><span style="${notesColor} padding:3px 8px; border-radius:20px; font-weight:600; font-size:13px;">${cow.notes}</span></td><td class="admin-only"><button class="btn-action btn-sacrificed" onclick="markAsSacrificed(${cow.id})">✅</button></td></tr>`;
+            tableBody.innerHTML += `<tr><td>${index + 1}</td><td><span class="unique-id">${cow.uniqueNo}</span></td><td>${cow.type}</td><td>${cow.color}</td><td><span style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:20px; font-weight:600; font-size:13px;">${cow.catName}</span></td><td>${cow.weight} কেজি</td><td>${cow.price.toLocaleString('bn-BD')} ৳</td><td><span style="${notesColor} padding:3px 8px; border-radius:20px; font-weight:600; font-size:13px;">${cow.notes}</span></td><td><span style="background:#f1f5f9; color:#475569; padding:3px 8px; border-radius:20px; font-weight:600; font-size:12px;">${cow.addedBy || 'অজানা'}</span></td><td class="write-only"><button class="btn-action btn-sacrificed" onclick="markAsSacrificed(${cow.id})">✅</button></td></tr>`;
         });
         updateDashboard(filteredCows);
     }
     function displaySacrificedCows() {
         const tableBody = document.getElementById('sacrificedData');
         tableBody.innerHTML = ''; 
-        const filtered = sacrificedCows.filter(cow => (cow.uniqueNo + cow.type + cow.color + cow.notes + cow.weight + cow.catName).toLowerCase().includes(currentSacrificedSearchText));
+        const filtered = sacrificedCows.filter(cow => (cow.uniqueNo + cow.type + cow.color + cow.notes + cow.weight + cow.catName + (cow.addedBy || '')).toLowerCase().includes(currentSacrificedSearchText));
         document.getElementById('noSacrificedData').style.display = filtered.length === 0 ? 'block' : 'none';
         filtered.forEach((cow, index) => {
-            tableBody.innerHTML += `<tr><td>${index + 1}</td><td><span class="unique-id">${cow.uniqueNo}</span></td><td>${cow.type}</td><td>${cow.color}</td><td><span style="background:#fee2e2; color:#991b1b; padding:3px 8px; border-radius:20px; font-weight:600; font-size:13px;">${cow.catName}</span></td><td>${cow.weight} কেজি</td><td>${cow.price.toLocaleString('bn-BD')} ৳</td><td>${cow.notes}</td></tr>`;
+            tableBody.innerHTML += `<tr><td>${index + 1}</td><td><span class="unique-id">${cow.uniqueNo}</span></td><td>${cow.type}</td><td>${cow.color}</td><td><span style="background:#fee2e2; color:#991b1b; padding:3px 8px; border-radius:20px; font-weight:600; font-size:13px;">${cow.catName}</span></td><td>${cow.weight} কেজি</td><td>${cow.price.toLocaleString('bn-BD')} ৳</td><td>${cow.notes}</td><td><span style="background:#f1f5f9; color:#475569; padding:3px 8px; border-radius:20px; font-weight:600; font-size:12px;">${cow.addedBy || 'অজানা'}</span></td></tr>`;
         });
     }
     function searchSacrificedCows() { currentSacrificedSearchText = document.getElementById('searchSacrificedInput').value.toLowerCase(); displaySacrificedCows(); }
@@ -755,7 +873,7 @@
     }
     function applyFilters() {
         let filtered = currentCategory === 'all' ? cows : cows.filter(cow => cow.category === currentCategory);
-        displayCows(filtered.filter(cow => (cow.uniqueNo + cow.type + cow.color + cow.notes + cow.weight + cow.catName).toLowerCase().includes(currentSearchText)));
+        displayCows(filtered.filter(cow => (cow.uniqueNo + cow.type + cow.color + cow.notes + cow.weight + cow.catName + (cow.addedBy || '')).toLowerCase().includes(currentSearchText)));
     }
     function filterCows(button, category) { currentCategory = category; document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); button.classList.add('active'); applyFilters(); }
     function searchCows() { currentSearchText = document.getElementById('searchInput').value.toLowerCase(); applyFilters(); }
@@ -763,7 +881,7 @@
         event.preventDefault();
         let catVal = document.getElementById('cow_category').value;
         let catNameMap = { 'large': 'বড়', 'medium': 'মাঝারি', 'small': 'ছোট', 'buffalo': 'মহিষ', 'camel': 'উট', 'gayal': 'গয়াল' };
-        cows.push({ id: Date.now(), uniqueNo: document.getElementById('cow_uniqueNo').value, type: document.getElementById('cow_type').value, color: document.getElementById('cow_color').value, weight: parseInt(document.getElementById('cow_weight').value), price: parseInt(document.getElementById('cow_price').value), notes: document.getElementById('cow_notes').value, category: catVal, catName: catNameMap[catVal] });
+        cows.push({ id: Date.now(), uniqueNo: document.getElementById('cow_uniqueNo').value, type: document.getElementById('cow_type').value, color: document.getElementById('cow_color').value, weight: parseInt(document.getElementById('cow_weight').value), price: parseInt(document.getElementById('cow_price').value), notes: document.getElementById('cow_notes').value, category: catVal, catName: catNameMap[catVal], addedBy: currentUser.username });
         document.getElementById('addCowForm').reset(); displayCows(cows); saveData(); alert('নতুন পশু যুক্ত হয়েছে!'); showPage('animals', document.querySelectorAll('.menu-item')[2]);
     }
 
@@ -781,7 +899,7 @@
         if(sales.length === 0) { document.getElementById('noSaleData').style.display='block'; document.getElementById('saleFooter').innerHTML=''; } 
         else {
             document.getElementById('noSaleData').style.display='none';
-            sales.forEach((s, i) => { let due = s.price - s.paid; saleBody.innerHTML += `<tr><td>${i+1}</td><td>${s.date}</td><td><span class="unique-id">${s.cowId}</span></td><td>${s.buyer}</td><td>${s.phone||'-'}</td><td>${s.probablePrice.toLocaleString('bn-BD')} ৳</td><td>${s.price.toLocaleString('bn-BD')} ৳</td><td>${s.paid.toLocaleString('bn-BD')} ৳</td><td style="color:${due>0?'#ef4444':'#10b981'};font-weight:bold;">${due.toLocaleString('bn-BD')} ৳</td><td class="admin-only"><button class="btn-action btn-delete" onclick="deleteSale(${s.id})">🗑️</button></td></tr>`; });
+            sales.forEach((s, i) => { let due = s.price - s.paid; saleBody.innerHTML += `<tr><td>${i+1}</td><td>${s.date}</td><td><span class="unique-id">${s.cowId}</span></td><td>${s.buyer}</td><td>${s.phone||'-'}</td><td>${s.probablePrice.toLocaleString('bn-BD')} ৳</td><td>${s.price.toLocaleString('bn-BD')} ৳</td><td>${s.paid.toLocaleString('bn-BD')} ৳</td><td style="color:${due>0?'#ef4444':'#10b981'};font-weight:bold;">${due.toLocaleString('bn-BD')} ৳</td><td class="write-only"><button class="btn-action btn-delete" onclick="deleteSale(${s.id})">🗑️</button></td></tr>`; });
             document.getElementById('saleFooter').innerHTML = `<tr><td colspan="5" style="text-align:right;">সর্বমোট:</td><td>${totalProbable.toLocaleString('bn-BD')} ৳</td><td>${totalAmount.toLocaleString('bn-BD')} ৳</td><td>${totalPaid.toLocaleString('bn-BD')} ৳</td><td style="color:#ef4444;">${totalDue.toLocaleString('bn-BD')} ৳</td><td></td></tr>`;
         }
     }
@@ -793,15 +911,93 @@
         document.getElementById('addSaleForm').reset(); displaySales(); saveData(); alert('বিক্রয় যুক্ত হয়েছে!');
     }
     function deleteSale(id) { sales = sales.filter(s => s.id !== id); displaySales(); saveData(); }
+
+    function displayExpenses() {
+        let totalExp = expenses.reduce((s, x) => s + x.amount, 0);
+        let expBody = document.getElementById('expenseData'); 
+        expBody.innerHTML = '';
+        if(expenses.length === 0) {
+            document.getElementById('noExpenseData').style.display = 'block';
+            document.getElementById('expenseFooter').innerHTML = '';
+        } else {
+            document.getElementById('noExpenseData').style.display = 'none';
+            expenses.forEach((e, i) => {
+                expBody.innerHTML += `<tr><td>${i+1}</td><td>${e.date}</td><td>${e.type}</td><td>${e.desc || '-'}</td><td style="color:#ef4444; font-weight:bold;">-${e.amount.toLocaleString('bn-BD')} ৳</td><td class="admin-only"><button class="btn-action btn-delete" onclick="deleteExpense(${e.id})">🗑️</button></td></tr>`;
+            });
+            document.getElementById('expenseFooter').innerHTML = `<tr><td colspan="4" style="text-align:right;">সর্বমোট খরচ:</td><td style="color:#ef4444;">${totalExp.toLocaleString('bn-BD')} ৳</td><td></td></tr>`;
+        }
+        displayAccounts(); 
+    }
+
+    function handleAddExpense(event) {
+        event.preventDefault();
+        expenses.push({ id: Date.now(), date: new Date().toLocaleDateString('bn-BD'), type: document.getElementById('exp_type').value, amount: parseInt(document.getElementById('exp_amount').value), desc: document.getElementById('exp_desc').value });
+        document.getElementById('addExpenseForm').reset(); displayExpenses(); saveData(); alert('নতুন খরচ যুক্ত হয়েছে!');
+    }
+
+    function deleteExpense(id) { expenses = expenses.filter(e => e.id !== id); displayExpenses(); saveData(); }
+
     function displayAccounts() {
         let curr = cows.reduce((s, c) => s + c.price, 0);
         let sacr = sacrificedCows.reduce((s, c) => s + c.price, 0);
+        let totalSaleAmount = sales.reduce((s, x) => s + x.price, 0);
+        let totalExpenses = expenses.reduce((s, x) => s + x.amount, 0);
+        let netProfit = totalSaleAmount - totalExpenses;
+
         document.getElementById('accountsCardsGrid').innerHTML = `
-            <div class="stat-square border-purple"><h3>মোট সম্ভাব্য মূল্য</h3><div class="big-num" style="font-size:24px;">${(curr+sacr).toLocaleString('bn-BD')}</div><p class="sub-text">সকল পশুর</p></div>
-            <div class="stat-square border-red"><h3>কোরবানি কৃত</h3><div class="big-num" style="font-size:24px;color:#ef4444;">${sacr.toLocaleString('bn-BD')}</div><p class="sub-text">টাকা (বাদ)</p></div>
-            <div class="stat-square border-green"><h3>বর্তমান মূল্য</h3><div class="big-num" style="font-size:24px;">${curr.toLocaleString('bn-BD')}</div><p class="sub-text">বাকি পশুর</p></div>`;
+            <div class="stat-square border-purple"><h3>মোট সম্পদ মূল্য</h3><div class="big-num" style="font-size:24px;">${(curr+sacr).toLocaleString('bn-BD')}</div><p class="sub-text">সকল পশুর</p></div>
+            <div class="stat-square border-blue"><h3>মোট বিক্রয়</h3><div class="big-num" style="font-size:24px;">${totalSaleAmount.toLocaleString('bn-BD')}</div><p class="sub-text">বিক্রি হওয়া পশুর</p></div>
+            <div class="stat-square border-red"><h3>মোট খরচ</h3><div class="big-num" style="font-size:24px; color:#ef4444;">${totalExpenses.toLocaleString('bn-BD')}</div><p class="sub-text">সকল খরচের</p></div>
+            <div class="stat-square border-green"><h3>নিট লাভ/ক্ষতি</h3><div class="big-num" style="font-size:24px; color:${netProfit >= 0 ? '#10b981' : '#ef4444'};">${netProfit.toLocaleString('bn-BD')}</div><p class="sub-text">টাকা</p></div>`;
     }
+    
     function printTable() { window.print(); }
+
+    // ডাটা ব্যাকআপ ফাংশন
+    function backupData() {
+        let dataStr = localStorage.getItem('qurbaniAppData') || JSON.stringify({ cows, sacrificedCows, sales, users, expenses });
+        let blob = new Blob([dataStr], { type: "application/json" });
+        let url = URL.createObjectURL(blob);
+        let a = document.createElement('a');
+        a.href = url;
+        a.download = "Qurbani_Backup_" + new Date().toLocaleDateString('bn-BD') + ".json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        alert('ব্যাকআপ সফলভাবে ডাউনলোড হয়েছে!');
+    }
+
+    // ডাটা রিস্টোর ফাংশন
+    function restoreData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (confirm('আপনি কি নিশ্চিত? বর্তমান ডাটা মুছে ব্যাকআপ ফাইলের ডাটা বসানো হবে।')) {
+                    localStorage.setItem('qurbaniAppData', JSON.stringify(data));
+                    alert('রিস্টোর সফল হয়েছে! অ্যাপ রিলোড হচ্ছে...');
+                    location.reload();
+                }
+            } catch (err) {
+                alert('ভুল ফাইল! অনুগ্রহ করে সঠিক ব্যাকআপ ফাইল দিন।');
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = ''; 
+    }
+
+    // ডাটা রিসেট ফাংশন
+    function resetAppData() {
+        if (confirm('⚠️ সতর্কীকরণ! সকল ডাটা (পশু, বিক্রয়, খরচ, ইউজার) স্থায়ীভাবে মুছে যাবে। আপনি কি নিশ্চিত?')) {
+            if (confirm('আবার নিশ্চিত করুন: সম্পূর্ণ অ্যাপের ডাটা রিসেট করতে চান?')) {
+                localStorage.removeItem('qurbaniAppData');
+                alert('অ্যাপ সফলভাবে রিসেট হয়েছে! অ্যাপ রিলোড হচ্ছে...');
+                location.reload();
+            }
+        }
+    }
 
     window.onload = async function() {
         await loadData(); 
