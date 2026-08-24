@@ -164,11 +164,12 @@
             .main-stats-grid { grid-template-columns: repeat(2, 1fr); }
             .expense-form-row .form-group { min-width: 100%; }
             .content-area { padding: 15px; }
-            .topbar { padding: 10px 15px; }
-            .user-info-top { gap: 10px; }
+            .topbar { padding: 10px 15px; flex-wrap: wrap; gap: 10px; }
+            .user-info-top { gap: 8px; }
             .logout-btn { padding: 6px 10px; font-size: 12px; }
-            .sync-badge { font-size: 11px; padding: 6px 10px; }
-            #loggedUserDisplay { display: none; } 
+            .sync-badge { font-size: 10px; padding: 5px 8px; }
+            /* আগে এখানে #loggedUserDisplay { display: none; } ছিল, আমি সরিয়ে দিয়েছি যাতে মোবাইলেও দেখায় */
+            #loggedUserDisplay { font-size: 12px; } 
         }
 
         @media print {
