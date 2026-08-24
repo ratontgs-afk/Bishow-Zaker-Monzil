@@ -456,21 +456,13 @@
                             <div>রোল: <span id="settingsUserRole" style="font-weight:700; text-transform:uppercase;"></span></div>
                         </div>
 
-                        <div id="companyProfileSettings">
-                            <h3 style="border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">কোম্পানির সেটিংস</h3>
-                            <form id="settingsForm" onsubmit="saveSettings(event)">
-                                <div class="form-grid">
-                                    <div class="form-group full-width"><label>Google Sheets Web App URL</label><input type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/..." disabled></div>
-                                </div>
-
-                                <div class="form-actions" style="margin-top:20px;">
-                                    <button type="button" class="btn btn-lock" id="unlockBtn" onclick="unlockSettings()">🔒 আনলক করুন</button>
-                                    <button type="submit" class="btn btn-save" id="saveSettingsBtn" style="display:none;">সেভ করুন</button>
-                                </div>
-                            </form>
+                        <!-- ক্লাউড সিঙ্ক স্ট্যাটাস -->
+                        <div style="background:#dcfce7; color:#166534; padding:15px; border-radius:8px; margin-bottom:20px; text-align:center;">
+                            <strong>☁️ ক্লাউড সিঙ্ক সক্রিয়</strong><br>
+                            <small>অটোমেটিক ব্যাকআপ ও সিঙ্ক চালু আছে।</small>
                         </div>
 
-                        <div style="margin-top:30px; border-top: 2px solid #e2e8f0; padding-top:20px;">
+                        <div style="margin-top:20px; border-top: 2px solid #e2e8f0; padding-top:20px;">
                             <h3>🧰 অ্যাডভান্সড সেটিংস</h3>
                             <div style="display:flex; justify-content:space-between; align-items:center; background:#f1f5f9; padding:15px; border-radius:8px; margin-top:10px;">
                                 <div><strong>খরচের হিসাব মডিউল</strong><br><small style="color:#64748b;">এই ফিচারটি চালু বা বন্ধ করতে টগল করুন</small></div>
@@ -554,7 +546,12 @@
     </div>
 
 <script>
-    let SCRIPT_URL = localStorage.getItem('googleScriptUrl') || '';
+    // =======================================================================
+    // এখানে আপনার Google Sheets Web App URL টি স্থায়ীভাবে বসিয়ে দিন
+    // YOUR_GOOGLE_SHEET_URL_HERE লেখাটি মুছে আপনার URL বসান (একদম শেষে /exec থাকবে)
+    // =======================================================================
+    let SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUrDLmisE-mMfo8umqvJNGl_KBOj_K0YCfHFw0qzV-oePPu2R4MAAWMxh4xkTm_wU/exec';
+
     let cows = [];
     let sacrificedCows = [];
     let sales = [];
@@ -579,7 +576,6 @@
             case 'synced': indicator.classList.add('sync-idle'); icon = '<i class="fa-solid fa-circle-check"></i>'; text = 'ক্লাউড সিঙ্কড'; break;
             case 'error': indicator.classList.add('sync-error'); icon = '<i class="fa-solid fa-cloud-exclamation"></i>'; text = 'সিঙ্ক ব্যর্থ'; break;
             case 'offline': indicator.classList.add('sync-offline'); icon = '<i class="fa-solid fa-cloud-slash"></i>'; text = 'অফলাইন'; break;
-            case 'not-connected': indicator.classList.add('sync-error'); icon = '<i class="fa-solid fa-plug-circle-xmark"></i>'; text = 'সিট কানেক্ট করুন'; break;
         }
         indicator.innerHTML = `${icon} ${text}`;
     }
@@ -607,7 +603,7 @@
             } else { users = [{ username: 'admin', password: '1234', role: 'full' }]; }
         }
 
-        if (!SCRIPT_URL) { updateSyncStatus('not-connected'); return; }
+        if (!SCRIPT_URL) return; 
         if (!navigator.onLine) { updateSyncStatus('offline'); return; }
         updateSyncStatus('syncing');
         try {
@@ -639,7 +635,7 @@
 
     async function saveData() {
         saveLocal();
-        if (!SCRIPT_URL) { updateSyncStatus('not-connected'); return; }
+        if (!SCRIPT_URL) return;
         if (!navigator.onLine) { updateSyncStatus('offline'); return; }
         if (isSyncing) { pendingSync = true; return; }
         
@@ -705,8 +701,6 @@
             document.body.classList.add('role-write');
         }
 
-        if(localStorage.getItem('googleScriptUrl')) document.getElementById('scriptUrlInput').value = localStorage.getItem('googleScriptUrl');
-        
         document.getElementById('expenseToggle').checked = localStorage.getItem('expenseModuleEnabled') === 'true';
         applySettingsVisibility();
 
@@ -716,40 +710,17 @@
         renderUsers(); displayCows(cows);
     }
     
-    function unlockSettings() { window.unlockTarget = 'settings'; document.getElementById('passwordModal').style.display = 'flex'; }
-    function unlockAdminTools() { window.unlockTarget = 'adminTools'; document.getElementById('passwordModal').style.display = 'flex'; }
+    function unlockAdminTools() { document.getElementById('passwordModal').style.display = 'flex'; }
     function closePasswordModal() { document.getElementById('passwordModal').style.display = 'none'; document.getElementById('verify_password').value = ''; }
     
     function verifyAdmin() {
         let pass = document.getElementById('verify_password').value;
         let adminUser = users.find(u => u.role === 'full' || u.role === 'admin');
         if(pass === adminUser.password) {
-            if (window.unlockTarget === 'adminTools') {
-                document.getElementById('adminToolsSection').style.display = 'block';
-                document.getElementById('adminToolsLocked').style.display = 'none';
-            } else {
-                document.getElementById('companyProfileSettings').style.display = 'block';
-                document.getElementById('profileLockedMessage').style.display = 'none';
-                document.getElementById('scriptUrlInput').disabled = false;
-                document.getElementById('saveSettingsBtn').style.display = 'inline-block';
-                document.getElementById('unlockBtn').style.display = 'none';
-            }
+            document.getElementById('adminToolsSection').style.display = 'block';
+            document.getElementById('adminToolsLocked').style.display = 'none';
             closePasswordModal();
         } else { alert("ভুল পাসওয়ার্ড!"); }
-    }
-    
-    function saveSettings(event) {
-        event.preventDefault();
-        let url = document.getElementById('scriptUrlInput').value;
-        if(url.trim() !== '') {
-            localStorage.setItem('googleScriptUrl', url.trim());
-            SCRIPT_URL = url.trim();
-            alert('সেটিংস সফলভাবে আপডেট হয়েছে! ডেটা লোড হচ্ছে...');
-            loadData();
-        } else { alert('অনুগ্রহ করে একটি বৈধ URL দিন।'); }
-        document.getElementById('scriptUrlInput').disabled = true;
-        document.getElementById('saveSettingsBtn').style.display = 'none';
-        document.getElementById('unlockBtn').style.display = 'inline-block';
     }
 
     function changeAdminPassword(event) {
@@ -953,7 +924,6 @@
     
     function printTable() { window.print(); }
 
-    // ডাটা ব্যাকআপ ফাংশন
     function backupData() {
         let dataStr = localStorage.getItem('qurbaniAppData') || JSON.stringify({ cows, sacrificedCows, sales, users, expenses });
         let blob = new Blob([dataStr], { type: "application/json" });
@@ -967,7 +937,6 @@
         alert('ব্যাকআপ সফলভাবে ডাউনলোড হয়েছে!');
     }
 
-    // ডাটা রিস্টোর ফাংশন
     function restoreData(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -988,7 +957,6 @@
         event.target.value = ''; 
     }
 
-    // ডাটা রিসেট ফাংশন
     function resetAppData() {
         if (confirm('⚠️ সতর্কীকরণ! সকল ডাটা (পশু, বিক্রয়, খরচ, ইউজার) স্থায়ীভাবে মুছে যাবে। আপনি কি নিশ্চিত?')) {
             if (confirm('আবার নিশ্চিত করুন: সম্পূর্ণ অ্যাপের ডাটা রিসেট করতে চান?')) {
